@@ -8,15 +8,17 @@ import numpy as np
 from absl import flags, app
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from disentanglement_lib.evaluation.metrics import dci
+from disentanglement_lib.evaluation.metrics import dci, mig, modularity_explicitness, sap_score
 from disentanglement_lib.visualize import visualize_scores
 import os
+import gin.tf
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '', 'File path for underlying factors c')
 flags.DEFINE_string('assign_mat_path', 'data/hirid/assign_mats/hirid_assign_mat.npy', 'Path for assignment matrix')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
+flags.DEFINE_enum('eval_type', 'dci', ['dci', 'mig', 'modularity', 'sap'], 'Evaluation metric.')
 flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'hirid', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d'], 'Type of data and how to evaluate')
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
 flags.DEFINE_enum('rescaling', 'linear', ['linear', 'standard'], 'Rescaling of ground truth factors')
@@ -24,6 +26,15 @@ flags.DEFINE_bool('shuffle', False, 'Whether or not to shuffle evaluation data.'
 flags.DEFINE_integer('dci_seed', 42, 'Random seed.')
 flags.DEFINE_bool('visualize_score', False, 'Whether or not to visualize score')
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
+
+### disentanglement_lib utils
+def _histogram_discretize(target, num_bins=20):
+  """Discretization based on histograms."""
+  discretized = np.zeros_like(target)
+  for i in range(target.shape[0]):
+    discretized[i, :] = np.digitize(target[i, :], np.histogram(
+        target[i, :], num_bins)[1][:-1])
+  return discretized
 
 def load_z_c(c_path, z_path):
     try:
@@ -107,21 +118,42 @@ def main(argv, model_dir=None):
     if FLAGS.data_type_dci == "hirid":
         n_train = 20000
         n_test = 5000
-    else:
-        n_train = 8000
-        n_test = 2000
+    else: # TODO: change back for cluster
+        n_train = 80
+        n_test = 20
 
-    importance_matrix, i_train, i_test = dci.compute_importance_gbt(
-        z_train[:n_train, :].transpose(),
-        c_train[:n_train, :].transpose().astype(int),
-        z_test[:n_test, :].transpose(), c_test[:n_test, :].transpose().astype(int))
-    # Calculate scores
-    d = dci.disentanglement(importance_matrix)
-    c = dci.completeness(importance_matrix)
-    print(F'D: {d}')
-    print(F'C: {c}')
-    print(F'I: {i_test}')
+    if FLAGS.eval_type == 'dci':
+        importance_matrix, i_train, i_test = dci.compute_importance_gbt(
+            z_train[:n_train, :].transpose(),
+            c_train[:n_train, :].transpose().astype(int),
+            z_test[:n_test, :].transpose(), c_test[:n_test, :].transpose().astype(int))
+        # Calculate scores
+        d = dci.disentanglement(importance_matrix)
+        c = dci.completeness(importance_matrix)
+        print(F'D: {d}')
+        print(F'C: {c}')
+        print(F'I: {i_test}')
+    elif FLAGS.eval_type == 'mig':
+        gin.bind_parameter("discretizer.discretizer_fn", _histogram_discretize)
+        gin.bind_parameter("discretizer.num_bins", 20)
+        mig = mig._compute_mig(z_train[:n_train, :].transpose(),
+                                     c_train[:n_train, :].transpose().astype(int))
+    elif FLAGS.eval_type == 'modularity':
+        gin.bind_parameter("discretizer.discretizer_fn", _histogram_discretize)
+        gin.bind_parameter("discretizer.num_bins", 20)
+        modularity = modularity_explicitness._compute_modularity_explicitness(z_train[:n_train, :].transpose(),
+                                           c_train[:n_train, :].transpose().astype(int),
+                                           z_test[:n_test, :].transpose(),
+                                           c_test[:n_test, :].transpose().astype(int))
+    elif FLAGS.eval_type == 'sap':
+        sap = sap_score._compute_sap(z_train[:n_train, :].transpose(),
+                                           c_train[:n_train, :].transpose().astype(int),
+                                           z_test[:n_test, :].transpose(),
+                                           c_test[:n_test, :].transpose().astype(int),
+                                           continuous_factors=False)
 
+
+    # TODO: adapt this part to more metrics
     if FLAGS.data_type_dci in ['hirid', 'physionet']:
         miss_idxs = np.nonzero(np.invert(mask))[0]
         for idx in miss_idxs:
