@@ -171,6 +171,7 @@ def main(argv, model_dir=None):
             print(F'D assign: {d_assign}')
             print(F'C assign: {c_assign}')
         elif FLAGS.eval_type == 'mig':
+            raise NotImplementedError
             # DOESNT WORK TO ADAPT THIS METRIC WITH ASSIGNMENT MATRIX
             # discretized_zs = utils.make_discretizer(z_train[:n_train, :].transpose())
             # mutual_info = utils.discrete_mutual_info(discretized_zs, c_train[:n_train, :].transpose().astype(int))
