@@ -130,7 +130,7 @@ lsf.*
 scripts/*
 
 # Baselines
-baselines/
+#baselines/
 #baselines/betatcvae
 #baselines/factorvae
 #baselines/dipvae_i
