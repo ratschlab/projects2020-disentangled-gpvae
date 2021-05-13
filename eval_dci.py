@@ -177,7 +177,7 @@ def main(argv, model_dir=None):
                 mutual_info = np.insert(mutual_info,
                                               idx,
                                               0, axis=1)
-            mutual_info_assign = np.matmul(importance_matrix, assign_mat) # normalize?
+            mutual_info_assign = np.matmul(mutual_info, assign_mat) # normalize?
             entropy = utils.discrete_entropy(c_train[:n_train, :].transpose().astype(int))
             sorted_mutual_info = np.sort(mutual_info_assign, axis=0)[::-1]
             discrete_mig_assign = np.mean(np.divide(sorted_mutual_info[0, :] - sorted_mutual_info[1, :], entropy[:]))
@@ -188,7 +188,7 @@ def main(argv, model_dir=None):
                 mutual_info = np.insert(mutual_info,
                                               idx,
                                               0, axis=1)
-            mutual_info_assign = np.matmul(importance_matrix, assign_mat) # normalize?
+            mutual_info_assign = np.matmul(mutual_info, assign_mat) # normalize?
             modularity_score_assign = modularity_explicitness.modularity(mutual_info_assign)
         elif FLAGS.eval_type == 'sap':
             score_matrix = sap_score.compute_score_matrix(z_train[:n_train, :].transpose(),
