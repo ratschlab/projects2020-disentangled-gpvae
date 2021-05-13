@@ -8,7 +8,7 @@ import numpy as np
 from absl import flags, app
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from disentanglement_lib.evaluation.metrics import dci, mig, modularity_explicitness, sap_score
+from disentanglement_lib.evaluation.metrics import dci, mig, modularity_explicitness, sap_score, utils
 from disentanglement_lib.visualize import visualize_scores
 import os
 import gin.tf
@@ -156,24 +156,71 @@ def main(argv, model_dir=None):
     # TODO: adapt this part to more metrics
     if FLAGS.data_type_dci in ['hirid', 'physionet']:
         miss_idxs = np.nonzero(np.invert(mask))[0]
-        for idx in miss_idxs:
-            importance_matrix = np.insert(importance_matrix,
-                                          idx,
-                                          0, axis=1)
         assign_mat = np.load(FLAGS.assign_mat_path)
-        impt_mat_assign = np.matmul(importance_matrix, assign_mat)
-        impt_mat_assign_norm = np.nan_to_num(
-            impt_mat_assign / np.sum(impt_mat_assign, axis=0))
-        d_assign = dci.disentanglement(impt_mat_assign_norm)
-        c_assign = dci.completeness(impt_mat_assign_norm)
-        print(F'D assign: {d_assign}')
-        print(F'C assign: {c_assign}')
+        if FLAGS.eval_type == 'dci':
+            for idx in miss_idxs:
+                importance_matrix = np.insert(importance_matrix,
+                                              idx,
+                                              0, axis=1)
+            # assign_mat = np.load(FLAGS.assign_mat_path)
+            impt_mat_assign = np.matmul(importance_matrix, assign_mat)
+            impt_mat_assign_norm = np.nan_to_num(
+                impt_mat_assign / np.sum(impt_mat_assign, axis=0))
+            d_assign = dci.disentanglement(impt_mat_assign_norm)
+            c_assign = dci.completeness(impt_mat_assign_norm)
+            print(F'D assign: {d_assign}')
+            print(F'C assign: {c_assign}')
+        elif FLAGS.eval_type == 'mig':
+            discretized_zs = utils.make_discretizer(z_train[:n_train, :].transpose())
+            mutual_info = utils.discrete_mutual_info(discretized_zs, c_train[:n_train, :].transpose().astype(int))
+            for idx in miss_idxs:
+                mutual_info = np.insert(mutual_info,
+                                              idx,
+                                              0, axis=1)
+            mutual_info_assign = np.matmul(importance_matrix, assign_mat) # normalize?
+            entropy = utils.discrete_entropy(c_train[:n_train, :].transpose().astype(int))
+            sorted_mutual_info = np.sort(mutual_info_assign, axis=0)[::-1]
+            discrete_mig_assign = np.mean(np.divide(sorted_mutual_info[0, :] - sorted_mutual_info[1, :], entropy[:]))
+        elif FLAGS.eval_type == 'modularity':
+            discretized_zs = utils.make_discretizer(z_train[:n_train, :].transpose())
+            mutual_info = utils.discrete_mutual_info(discretized_zs, c_train[:n_train,:].transpose().astype(int))
+            for idx in miss_idxs:
+                mutual_info = np.insert(mutual_info,
+                                              idx,
+                                              0, axis=1)
+            mutual_info_assign = np.matmul(importance_matrix, assign_mat) # normalize?
+            modularity_score_assign = modularity_explicitness.modularity(mutual_info_assign)
+        elif FLAGS.eval_type == 'sap':
+            score_matrix = sap_score.compute_score_matrix(z_train[:n_train, :].transpose(),
+                                           c_train[:n_train, :].transpose().astype(int),
+                                           z_test[:n_test, :].transpose(),
+                                           c_test[:n_test, :].transpose().astype(int),
+                                           continuous_factors=False)
+            for idx in miss_idxs:
+                score_matrix = np.insert(score_matrix,
+                                              idx,
+                                              0, axis=1)
+            score_matrix_assign = np.matmul(score_matrix, assign_mat) # normalize?
+            SAP_score_assign = sap_score.compute_avg_diff_top_two(score_matrix_assign)
 
     if FLAGS.save_score:
         if FLAGS.data_type_dci in ['hirid', 'physionet']:
-            np.savez(F'{out_dir}/dci_assign_2_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
-                     disentanglement=d, completeness=c,
-                     disentanglement_assign=d_assign, completeness_assign=c_assign)
+            if FLAGS.eval_type == 'dci':
+                np.savez(F'{out_dir}/dci_assign_2_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
+                         disentanglement=d, completeness=c,
+                         disentanglement_assign=d_assign, completeness_assign=c_assign)
+            elif FLAGS.eval_type == 'mig':
+                np.savez(F'{out_dir}/mig_assign_{FLAGS.dci_seed}',
+                         mig=mig_eval_score['discrete_mig'], mig_assign=discrete_mig_assign)
+            elif FLAGS.eval_type == 'modularity':
+                np.savez(F'{out_dir}/modularity_assign_{FLAGS.dci_seed}',
+                         modularity=modularity_eval_score['modularity_score'],
+                         modularity_assign=modularity_score_assign,
+                         explicitness=modularity_eval_score[
+                             'explicitness_score_test'])
+            elif FLAGS.eval_type == 'sap':
+                np.savez(F'{out_dir}/sap_assign_{FLAGS.dci_seed}',
+                         sap=sap_eval_score['SAP_score'], sap_assign=SAP_score_assign)
         else:
             if FLAGS.eval_type == 'dci':
                 np.savez(F'{out_dir}/dci_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
