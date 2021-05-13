@@ -29,7 +29,7 @@ def walklevel(some_dir, level=0):
         if num_sep + level <= num_sep_this:
             del dirs[:]
 
-def aggregate_gpvae(N, base_dir):
+def aggregate_gpvae(N, metric, base_dir):
     """
     Collects all dci scores and aggregates into single array.
     Args:
@@ -40,19 +40,37 @@ def aggregate_gpvae(N, base_dir):
     Returns:
         dci_scores, [3xNxM] np array
     """
-    dci_scores = np.zeros((N,3))
+    if metric == 'dci':
+        scores = np.zeros((N,3))
+    elif metric == 'modularity':
+        scores = np.zeros((N,2))
+    else:
+        scores = np.zeros((N))
+
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     assert len(subdirs) == N
 
     for i, subdir in enumerate(subdirs):
-        potential_paths = [file.name for file in os.scandir(subdir) if file.name.endswith('npz')]
-        single_score_path = os.path.join(subdir,potential_paths[0])
-        single_score = np.load(single_score_path)
-        dci_scores[i, 0] = single_score['disentanglement']
-        dci_scores[i, 1] = single_score['completeness']
-        dci_scores[i, 2] = single_score['informativeness_test']
+        if metric == 'dci':
+            potential_paths = [file.name for file in os.scandir(subdir) if file.name.endswith('npz')]
+            single_score_path = os.path.join(subdir,potential_paths[0])
+            single_score = np.load(single_score_path)
+            scores[i, 0] = single_score['disentanglement']
+            scores[i, 1] = single_score['completeness']
+            scores[i, 2] = single_score['informativeness_test']
+        else:
+            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith(metric)]
+            single_score_path = os.path.join(subdir, potential_paths[0])
+            single_score = np.load(single_score_path)
+            if metric == 'mig':
+                scores[i] = single_score['mig']
+            elif metric == 'modularity':
+                scores[i, 0] = single_score['modularity']
+                scores[i, 0] = single_score['explicitness']
+            if metric == 'sap':
+                scores[i] = single_score['sap']
 
-    return dci_scores
+    return scores
 
 def aggregate_hirid(N, base_dir):
     scores = np.zeros((N,5))
@@ -137,7 +155,7 @@ def main(argv):
     del argv # Unused
 
     if FLAGS.model == 'gpvae':
-        dci_scores = aggregate_gpvae(FLAGS.n, FLAGS.base_dir)
+        dci_scores = aggregate_gpvae(FLAGS.n, FLAGS.metric, FLAGS.base_dir)
     elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(FLAGS.n, FLAGS.params, FLAGS.metric, FLAGS.base_dir)
     elif FLAGS.model == 'hirid':
