@@ -17,7 +17,7 @@ flags.DEFINE_string('exp_name', '', 'Name of experiment to evaluate')
 flags.DEFINE_enum('model', 'adagvae', ['adagvae', 'annealedvae', 'betavae',
                                        'betatcvae', 'dipvae_i', 'dipvae_ii',
                                        'factorvae'], 'Model to evaluate')
-flags.DEFINE_enum('data', 'dsprites', ['dsprites', 'smallnorb', 'cars3d', 'shapes3d'],
+flags.DEFINE_enum('data', 'dsprites_full', ['dsprites_full', 'smallnorb', 'cars3d', 'shapes3d'],
                   'Dataset for evaluation')
 flags.DEFINE_string('subset', None, 'Subset of dataset')
 flags.DEFINE_enum('metric', 'dci', ['dci', 'mig', 'modularity', 'sap'], 'Evaluation metric')
