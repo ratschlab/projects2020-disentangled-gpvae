@@ -171,20 +171,21 @@ def main(argv, model_dir=None):
             print(F'D assign: {d_assign}')
             print(F'C assign: {c_assign}')
         elif FLAGS.eval_type == 'mig':
-            discretized_zs = utils.make_discretizer(z_train[:n_train, :].transpose())
-            mutual_info = utils.discrete_mutual_info(discretized_zs, c_train[:n_train, :].transpose().astype(int))
-            for idx in miss_idxs:
-                mutual_info = np.insert(mutual_info,
-                                              idx,
-                                              0, axis=1)
-            mutual_info_assign = np.matmul(mutual_info, assign_mat) # normalize?
-            entropy = utils.discrete_entropy(c_train[:n_train, :].transpose().astype(int))
-            print(entropy.shape)
-            print(assign_mat.shape)
-            print(mutual_info.shape)
-            entropy_assign = np.matmul(entropy, assign_mat)
-            sorted_mutual_info = np.sort(mutual_info_assign, axis=0)[::-1]
-            discrete_mig_assign = np.mean(np.divide(sorted_mutual_info[0, :] - sorted_mutual_info[1, :], entropy_assign[:]))
+            # DOESNT WORK TO ADAPT THIS METRIC WITH ASSIGNMENT MATRIX
+            # discretized_zs = utils.make_discretizer(z_train[:n_train, :].transpose())
+            # mutual_info = utils.discrete_mutual_info(discretized_zs, c_train[:n_train, :].transpose().astype(int))
+            # for idx in miss_idxs:
+            #     mutual_info = np.insert(mutual_info,
+            #                                   idx,
+            #                                   0, axis=1)
+            # mutual_info_assign = np.matmul(mutual_info, assign_mat) # normalize?
+            # entropy = utils.discrete_entropy(c_train[:n_train, :].transpose().astype(int))
+            # print(entropy.shape)
+            # print(assign_mat.shape)
+            # print(mutual_info.shape)
+            # entropy_assign = np.matmul(entropy, assign_mat)
+            # sorted_mutual_info = np.sort(mutual_info_assign, axis=0)[::-1]
+            # discrete_mig_assign = np.mean(np.divide(sorted_mutual_info[0, :] - sorted_mutual_info[1, :], entropy_assign[:]))
         elif FLAGS.eval_type == 'modularity':
             discretized_zs = utils.make_discretizer(z_train[:n_train, :].transpose())
             mutual_info = utils.discrete_mutual_info(discretized_zs, c_train[:n_train,:].transpose().astype(int))
