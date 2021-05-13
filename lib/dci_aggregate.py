@@ -17,7 +17,7 @@ flags.DEFINE_integer('n', 10, 'Number of experiments.')
 flags.DEFINE_string('exp_name', '', 'Experiment naming scheme')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 flags.DEFINE_integer('dci_seed', None, 'Take score corresponding to certain seed, if specified')
-flags.DEFINE_enum('metric', 'dci', ['dci', 'mig', 'modularity', 'sap'])
+flags.DEFINE_enum('metric', 'dci', ['dci', 'mig', 'modularity', 'sap'], 'Metric to aggregate')
 
 def walklevel(some_dir, level=0):
     some_dir = some_dir.rstrip(os.path.sep)
