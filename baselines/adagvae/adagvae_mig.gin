@@ -1,0 +1,7 @@
+evaluation.evaluation_fn = @mig
+dataset.name="auto"
+evaluation.random_seed = 0
+mig.num_train=8000
+mig.num_test=2000
+discretizer.discretizer_fn = @histogram_discretizer
+discretizer.num_bins = 20
