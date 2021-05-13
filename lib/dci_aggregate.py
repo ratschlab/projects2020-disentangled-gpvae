@@ -17,6 +17,7 @@ flags.DEFINE_integer('n', 10, 'Number of experiments.')
 flags.DEFINE_string('exp_name', '', 'Experiment naming scheme')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 flags.DEFINE_integer('dci_seed', None, 'Take score corresponding to certain seed, if specified')
+flags.DEFINE_enum('metric', 'dci', ['dci', 'mig', 'modularity', 'sap'])
 
 def walklevel(some_dir, level=0):
     some_dir = some_dir.rstrip(os.path.sep)
@@ -78,7 +79,7 @@ def aggregate_hirid(N, base_dir):
 
     return scores
 
-def aggregate_baseline(N, params, base_dir='dim'):
+def aggregate_baseline(N, params, metric, base_dir='dim'):
     """
     Collects all dci scores and aggregates into single array.
     Args:
@@ -89,7 +90,12 @@ def aggregate_baseline(N, params, base_dir='dim'):
     Returns:
         dci_scores, [3xNxM] np array
     """
-    dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
+    if metric == 'dci':
+        scores = np.zeros((3,N,len(params)), dtype=np.float32)
+    elif metric == 'modularity':
+        scores = np.zeros((2, N, len(params)), dtype=np.float32)
+    else:
+        scores = np.zeros((N, len(params)), dtype=np.float32)
 
     for m, param in enumerate(params):
         # if param is not None:
@@ -102,16 +108,30 @@ def aggregate_baseline(N, params, base_dir='dim'):
             # print(dirs[:N])
             for n, dir in enumerate(dirs[:N]):
                 # print(n, dir)
-                json_path = os.path.join(model_path, dir, 'metrics', 'dci',
+                json_path = os.path.join(model_path, dir, 'metrics', metric,
                                          'results', 'aggregate',
                                          'evaluation.json')
-                with open(json_path) as json_file:
-                    dci = json.load(json_file)  # PROPERLY PARSE JSON FILE
-                    dci_scores[0, n, m] = dci['evaluation_results.disentanglement']
-                    dci_scores[1, n, m] = dci['evaluation_results.completeness']
-                    dci_scores[2, n, m] = dci['evaluation_results.informativeness_test']
+                if metric == 'dci':
+                    with open(json_path) as json_file:
+                        dci = json.load(json_file)  # PROPERLY PARSE JSON FILE
+                        scores[0, n, m] = dci['evaluation_results.disentanglement']
+                        scores[1, n, m] = dci['evaluation_results.completeness']
+                        scores[2, n, m] = dci['evaluation_results.informativeness_test']
+                elif metric == 'mig':
+                    with open(json_path) as json_file:
+                        mig = json.load(json_file)
+                        scores[n, m] = mig['evaluation_results.discrete_mig']
+                elif metric == 'modularity':
+                    with open(json_path) as json_file:
+                        modularity = json.load(json_file)
+                        scores[0, n, m] = modularity['evaluation_results.modularity_score']
+                        scores[1, n, m] = modularity['evaluation_results.explicitness_score_test']
+                elif metric == 'sap':
+                    with open(json_path) as json_file:
+                        sap = json.load(json_file)
+                        scores[n, m] = sap['evaluation_results.SAP_score']
 
-    return np.squeeze(dci_scores)
+    return np.squeeze(scores)
 
 def main(argv):
     del argv # Unused
@@ -119,7 +139,7 @@ def main(argv):
     if FLAGS.model == 'gpvae':
         dci_scores = aggregate_gpvae(FLAGS.n, FLAGS.base_dir)
     elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
-        dci_scores = aggregate_baseline(FLAGS.n, FLAGS.params, FLAGS.base_dir)
+        dci_scores = aggregate_baseline(FLAGS.n, FLAGS.params, FLAGS.metric, FLAGS.base_dir)
     elif FLAGS.model == 'hirid':
         dci_scores = aggregate_hirid(FLAGS.n, FLAGS.base_dir)
     else:
