@@ -145,19 +145,20 @@ def main(argv):
     else:
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
-    print(dci_scores.shape)
+    print(F'Aggregated shape: {dci_scores.shape}')
+    print(F'Mean scorer: {np.mean(dci_scores, axis=0)}')
     # print(np.round(dci_scores[0,...], 2))
-    mean_scores = np.mean(dci_scores, axis=0)
-    std_scores = np.std(dci_scores, axis=0) / np.sqrt(len(dci_scores)) # Yields standard error
-    print(F'Mean D: {np.round(mean_scores[0], 3)}')
-    print(F'Mean C: {np.round(mean_scores[1], 3)}')
-    print(F'Mean D assign: {np.round(mean_scores[2], 3)}')
-    print(F'Std D assign: {np.round(std_scores[2], 3)}')
-    print(F'Mean C assign: {np.round(mean_scores[3], 3)}')
-    print(F'Std C assign: {np.round(std_scores[3], 3)}')
-    print(F'Mean I assign: {np.round(mean_scores[4], 3)}')
-    print(F'Std I assign: {np.round(std_scores[4], 3)}')
-    print(dci_scores[:,4])
+    # mean_scores = np.mean(dci_scores, axis=0)
+    # std_scores = np.std(dci_scores, axis=0) / np.sqrt(len(dci_scores)) # Yields standard error
+    # print(F'Mean D: {np.round(mean_scores[0], 3)}')
+    # print(F'Mean C: {np.round(mean_scores[1], 3)}')
+    # print(F'Mean D assign: {np.round(mean_scores[2], 3)}')
+    # print(F'Std D assign: {np.round(std_scores[2], 3)}')
+    # print(F'Mean C assign: {np.round(mean_scores[3], 3)}')
+    # print(F'Std C assign: {np.round(std_scores[3], 3)}')
+    # print(F'Mean I assign: {np.round(mean_scores[4], 3)}')
+    # print(F'Std I assign: {np.round(std_scores[4], 3)}')
+    # print(dci_scores[:,4])
     # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
     # print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
