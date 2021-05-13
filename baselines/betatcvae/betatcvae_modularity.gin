@@ -1,0 +1,7 @@
+evaluation.evaluation_fn = @modularity_explicitness
+dataset.name="auto"
+evaluation.random_seed = 0
+modularity_explicitness.num_train=8000
+modularity_explicitness.num_test=2000
+discretizer.discretizer_fn = @histogram_discretizer
+discretizer.num_bins = 20
