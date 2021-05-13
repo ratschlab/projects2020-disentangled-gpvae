@@ -119,8 +119,8 @@ def main(argv, model_dir=None):
         n_train = 20000
         n_test = 5000
     else: # TODO: change back for cluster
-        n_train = 80
-        n_test = 20
+        n_train = 8000
+        n_test = 2000
 
     if FLAGS.eval_type == 'dci':
         importance_matrix, i_train, i_test = dci.compute_importance_gbt(
@@ -136,17 +136,17 @@ def main(argv, model_dir=None):
     elif FLAGS.eval_type == 'mig':
         gin.bind_parameter("discretizer.discretizer_fn", _histogram_discretize)
         gin.bind_parameter("discretizer.num_bins", 20)
-        mig = mig._compute_mig(z_train[:n_train, :].transpose(),
+        mig_eval_score = mig._compute_mig(z_train[:n_train, :].transpose(),
                                      c_train[:n_train, :].transpose().astype(int))
     elif FLAGS.eval_type == 'modularity':
         gin.bind_parameter("discretizer.discretizer_fn", _histogram_discretize)
         gin.bind_parameter("discretizer.num_bins", 20)
-        modularity = modularity_explicitness._compute_modularity_explicitness(z_train[:n_train, :].transpose(),
+        modularity_eval_score = modularity_explicitness._compute_modularity_explicitness(z_train[:n_train, :].transpose(),
                                            c_train[:n_train, :].transpose().astype(int),
                                            z_test[:n_test, :].transpose(),
                                            c_test[:n_test, :].transpose().astype(int))
     elif FLAGS.eval_type == 'sap':
-        sap = sap_score._compute_sap(z_train[:n_train, :].transpose(),
+        sap_eval_score = sap_score._compute_sap(z_train[:n_train, :].transpose(),
                                            c_train[:n_train, :].transpose().astype(int),
                                            z_test[:n_test, :].transpose(),
                                            c_test[:n_test, :].transpose().astype(int),
@@ -175,8 +175,16 @@ def main(argv, model_dir=None):
                      disentanglement=d, completeness=c,
                      disentanglement_assign=d_assign, completeness_assign=c_assign)
         else:
-            np.savez(F'{out_dir}/dci_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
-                     disentanglement=d, completeness=c)
+            if FLAGS.eval_type == 'dci':
+                np.savez(F'{out_dir}/dci_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
+                         disentanglement=d, completeness=c)
+            elif FLAGS.eval_type == 'mig':
+                np.savez(F'{out_dir}/mig_{FLAGS.dci_seed}', mig=mig_eval_score['discrete_mig'])
+            elif FLAGS.eval_type == 'modularity':
+                np.savez(F'{out_dir}/modularity_{FLAGS.dci_seed}', modularity=modularity_eval_score['modularity_score'],
+                         explicitness=modularity_eval_score['explicitness_score_test'])
+            elif FLAGS.eval_type == 'sap':
+                np.savez(F'{out_dir}/sap_{FLAGS.dci_seed}', sap=sap_eval_score['SAP_score'])
 
     # Visualization
     if FLAGS.visualize_score:
