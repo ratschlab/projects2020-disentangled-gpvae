@@ -146,7 +146,7 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
     print(F'Aggregated shape: {dci_scores.shape}')
-    print(F'Mean scorer: {np.mean(dci_scores, axis=0)}')
+    print(F'Mean {FLAGS.metric} score: {np.mean(dci_scores, axis=0)}')
     # print(np.round(dci_scores[0,...], 2))
     # mean_scores = np.mean(dci_scores, axis=0)
     # std_scores = np.std(dci_scores, axis=0) / np.sqrt(len(dci_scores)) # Yields standard error
