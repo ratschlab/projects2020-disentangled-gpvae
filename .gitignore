@@ -130,6 +130,7 @@ lsf.*
 scripts/*
 
 !/scripts/baseline_eval.sh
+!/scripts/additional_metrics_eval.sh
 
 # Baselines
 #baselines/
