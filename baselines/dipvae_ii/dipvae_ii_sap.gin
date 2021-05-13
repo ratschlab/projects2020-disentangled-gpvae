@@ -1,0 +1,6 @@
+evaluation.evaluation_fn = @sap_score
+dataset.name="auto"
+evaluation.random_seed = 0
+sap_score.num_train=8000
+sap_score.num_test=2000
+sap_score.continuous_factors=False
