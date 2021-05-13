@@ -179,6 +179,8 @@ def main(argv, model_dir=None):
                                               0, axis=1)
             mutual_info_assign = np.matmul(mutual_info, assign_mat) # normalize?
             entropy = utils.discrete_entropy(c_train[:n_train, :].transpose().astype(int))
+            print(entropy.shape)
+            print(assign_mat.shape)
             entropy_assign = np.matmul(entropy, assign_mat)
             sorted_mutual_info = np.sort(mutual_info_assign, axis=0)[::-1]
             discrete_mig_assign = np.mean(np.divide(sorted_mutual_info[0, :] - sorted_mutual_info[1, :], entropy_assign[:]))
