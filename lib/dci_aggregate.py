@@ -181,8 +181,8 @@ def main(argv):
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
-            np.save(os.path.join(FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
-            print(F"Saved scores at :{os.path.join(FLAGS.base_dir, 'dci_aggr.npy')}")
+            np.save(os.path.join(FLAGS.base_dir, F'{FLAGS.metric}_aggr.npy'), dci_scores)
+            print(F"Saved scores at :{os.path.join(FLAGS.base_dir, F'{FLAGS.metric}_aggr.npy')}")
         elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.exp_name, F'{FLAGS.model}_{FLAGS.exp_name}_{FLAGS.metric}.npy'), dci_scores)
             print(F"Saved scores at :{os.path.join('baselines', FLAGS.model, FLAGS.exp_name, F'{FLAGS.metric}_aggr.npy')}")
