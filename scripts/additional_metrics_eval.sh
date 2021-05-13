@@ -17,15 +17,15 @@ for metric in mig modularity sap;do
 #  done
 #
 #  # NORB
-#  for i in 201224_n_1,1 201224_n_2,2 210127_n_21,3 201224_n_4,4 201225_n_5,5 201225_n_6,6 201225_n_7,7 201225_n_8,8 201225_n_9,9 210127_n_23,10; do
-#    IFS=',' read model_name n <<< "${i}"
-#    bsub -o /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/norb_full1/norb_"$metric"_n_"$n" \
-#    -g /gpvae_eval -R "rusage[mem=20000]" python eval_dci.py \
-#    --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/factors_norb_full1.npz \
-#    --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/norb_full1/base/len_5/same/"$model_name" \
-#    --data_type_dci norb --save_score --eval_type "$metric"
-#  done
-#
+  for i in 201224_n_1,1 201224_n_2,2 210127_n_21,3 201224_n_4,4 201225_n_5,5 201225_n_6,6 201225_n_7,7 201225_n_8,8 201225_n_9,9 210127_n_23,10; do
+    IFS=',' read model_name n <<< "${i}"
+    bsub -o log_norb_"$metric"_n_"$n" \
+    -g /gpvae_eval -R "rusage[mem=20000]" python eval_dci.py \
+    --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/factors_norb_full1.npz \
+    --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/norb_full1/base/len_5/same/final_10/"$model_name" \
+    --data_type_dci norb --save_score --eval_type "$metric"
+  done
+# /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/norb_full1/norb_"$metric"_n_"$n"
 #  # cars3d
 #  for i in 201229_n_1,1 201230_n_2,2 201230_n_3,3 201231_n_4,4 210130_n_22,5 201231_n_6,6 210101_n_7,7 210101_n_8,8 210101_n_9,9 210101_n_23,10; do
 #    IFS=',' read model_name n <<< "${i}"
@@ -47,11 +47,11 @@ for metric in mig modularity sap;do
 #  done
 #  # hirid
 
-  bsub -o /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/shapes_part2/shapes_"$metric"_n_10 \
-  -g /gpvae_eval -R "rusage[mem=20000]" python eval_dci.py \
-  --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/factors_shapes_part2.npz \
-  --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/shapes_part2/base/len_5/same/210103_n_10 \
-  --data_type_dci shapes3d --save_score --eval_type "$metric"
+#  bsub -o /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/shapes_part2/shapes_"$metric"_n_10 \
+#  -g /gpvae_eval -R "rusage[mem=20000]" python eval_dci.py \
+#  --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/factors_shapes_part2.npz \
+#  --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/shapes_part2/base/len_5/same/210103_n_10 \
+#  --data_type_dci shapes3d --save_score --eval_type "$metric"
 done
 
 
