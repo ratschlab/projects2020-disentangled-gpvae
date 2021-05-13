@@ -129,6 +129,8 @@ lsf.*
 
 scripts/*
 
+!/scripts/baseline_eval.sh
+
 # Baselines
 #baselines/
 #baselines/betatcvae
