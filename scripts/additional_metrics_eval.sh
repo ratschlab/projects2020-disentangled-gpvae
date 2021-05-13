@@ -23,7 +23,7 @@ for metric in mig modularity sap;do
     -g /gpvae_eval -R "rusage[mem=20000]" python eval_dci.py \
     --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/factors_norb_full1.npz \
     --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/norb_full1/base/len_5/same/final_10/"$model_name" \
-    --data_type_dci norb --save_score --eval_type "$metric"
+    --data_type_dci smallnorb --save_score --eval_type "$metric"
   done
 # /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/norb_full1/norb_"$metric"_n_"$n"
 #  # cars3d
