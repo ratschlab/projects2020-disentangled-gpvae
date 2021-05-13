@@ -60,6 +60,7 @@ def aggregate_gpvae(N, metric, base_dir):
             scores[i, 2] = single_score['informativeness_test']
         else:
             potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith(metric)]
+            print(potential_paths)
             single_score_path = os.path.join(subdir, potential_paths[0])
             single_score = np.load(single_score_path)
             if metric == 'mig':
