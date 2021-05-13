@@ -12,6 +12,7 @@ from absl import app, flags
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_string('base_dir', '', 'Base directory')
 flags.DEFINE_string('exp_name', '', 'Name of experiment to evaluate')
 flags.DEFINE_enum('model', 'adagvae', ['adagvae', 'annealedvae', 'betavae',
                                        'betatcvae', 'dipvae_i', 'dipvae_ii',
@@ -26,8 +27,8 @@ flags.mark_flag_as_required('subset')
 def main(argv):
     baseline_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                  FLAGS.model)
-    result_path = os.path.join(baseline_path, FLAGS.exp_name, 'metrics', FLAGS.metric)
-    representation_path = os.path.join(FLAGS.base_path, 'representation')
+    result_path = os.path.join(baseline_path, FLAGS.base_dir, FLAGS.exp_name, 'metrics', FLAGS.metric)
+    representation_path = os.path.join(baseline_path, FLAGS.base_dir, FLAGS.exp_name, 'representation')
 
     gin_bindings = [
         "dataset.name = '{}'".format(FLAGS.data),
