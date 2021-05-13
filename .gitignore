@@ -132,6 +132,7 @@ scripts/*
 !/scripts/baseline_eval.sh
 !/scripts/additional_metrics_eval.sh
 !/scripts/hirid_additional_metrics_eval.sh
+!/scripts/aggregate_new_metrics_baselines.sh
 
 # Baselines
 #baselines/
