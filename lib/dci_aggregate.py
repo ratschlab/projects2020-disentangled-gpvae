@@ -172,7 +172,7 @@ def main(argv):
     elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(FLAGS.n, FLAGS.params, FLAGS.metric, FLAGS.base_dir)
     elif FLAGS.model == 'hirid':
-        dci_scores = aggregate_hirid(FLAGS.n, FLAGS.base_dir)
+        dci_scores = aggregate_hirid(FLAGS.n, FLAGS.metric, FLAGS.base_dir)
     else:
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
