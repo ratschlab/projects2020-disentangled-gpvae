@@ -67,7 +67,7 @@ def aggregate_gpvae(N, metric, base_dir):
                 scores[i] = single_score['mig']
             elif metric == 'modularity':
                 scores[i, 0] = single_score['modularity']
-                scores[i, 0] = single_score['explicitness']
+                scores[i, 1] = single_score['explicitness']
             if metric == 'sap':
                 scores[i] = single_score['sap']
 
@@ -85,7 +85,6 @@ def aggregate_hirid(N, metric, base_dir):
         # print(subdirs)
         subdirs = subdirs[:N]
     assert len(subdirs) == N
-    print(metric)
     for i, subdir in enumerate(subdirs):
         if metric == 'dci':
             if FLAGS.dci_seed is not None:
@@ -104,7 +103,6 @@ def aggregate_hirid(N, metric, base_dir):
             single_score_path = os.path.join(subdir, F'modularity_assign_{FLAGS.dci_seed}.npz')
             single_score = np.load(single_score_path)
             scores[i, 0] = single_score['modularity']
-            print(single_score['modularity'])
             scores[i, 1] = single_score['modularity_assign']
         elif metric == 'sap':
             single_score_path = os.path.join(subdir, F'sap_assign_{FLAGS.dci_seed}.npz')
