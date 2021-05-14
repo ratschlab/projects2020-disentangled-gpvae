@@ -85,6 +85,7 @@ def aggregate_hirid(N, metric, base_dir):
         # print(subdirs)
         subdirs = subdirs[:N]
     assert len(subdirs) == N
+    print(metric)
     for i, subdir in enumerate(subdirs):
         if metric == 'dci':
             if FLAGS.dci_seed is not None:
