@@ -103,6 +103,7 @@ def aggregate_hirid(N, metric, base_dir):
             single_score_path = os.path.join(subdir, F'modularity_assign_{FLAGS.dci_seed}.npz')
             single_score = np.load(single_score_path)
             scores[i, 0] = single_score['modularity']
+            print(single_score['modularity'])
             scores[i, 1] = single_score['modularity_assign']
         elif metric == 'sap':
             single_score_path = os.path.join(subdir, F'sap_assign_{FLAGS.dci_seed}.npz')
