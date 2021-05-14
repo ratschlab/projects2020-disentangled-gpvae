@@ -205,7 +205,7 @@ def main(argv):
             if FLAGS.dci_seed is not None:
                 filename = os.path.join(FLAGS.base_dir, F'dci_assign_2_{FLAGS.exp_name}_{FLAGS.dci_seed}.npy')
             else:
-                filename = os.path.join(FLAGS.base_dir, F'dci_assign_2_{FLAGS.exp_name}_orig.npy')
+                filename = os.path.join(FLAGS.base_dir, F'{FLAGS.metric}_assign_2_{FLAGS.exp_name}_orig.npy')
             print(filename)
             np.save(filename, dci_scores)
         else:
