@@ -145,6 +145,7 @@ def main(argv, model_dir=None):
                                            c_train[:n_train, :].transpose().astype(int),
                                            z_test[:n_test, :].transpose(),
                                            c_test[:n_test, :].transpose().astype(int))
+        print(F'Modularity score: {modularity_eval_score}')
     elif FLAGS.eval_type == 'sap':
         sap_eval_score = sap_score._compute_sap(z_train[:n_train, :].transpose(),
                                            c_train[:n_train, :].transpose().astype(int),
