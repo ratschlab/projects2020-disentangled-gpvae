@@ -67,6 +67,7 @@ def aggregate_gpvae(N, metric, base_dir):
                 scores[i] = single_score['mig']
             elif metric == 'modularity':
                 scores[i, 0] = single_score['modularity']
+                print(single_score['modularity'])
                 scores[i, 1] = single_score['explicitness']
             if metric == 'sap':
                 scores[i] = single_score['sap']
