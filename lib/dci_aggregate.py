@@ -77,7 +77,7 @@ def aggregate_hirid(N, metric, base_dir):
     if metric == 'dci':
         scores = np.zeros((N,5))
     else:
-        scores = np.zeros((N,5))
+        scores = np.zeros((N,2))
 
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     if FLAGS.exp_name != '':
