@@ -14,7 +14,7 @@ for metric in modularity sap; do
     --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_std.npz \
     --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/dgpvae/models/hirid/comp/base/dim_8/len_25/scaled/n_scales_4/210126_n_"$n" \
     --assign_mat_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/assign_mats/assign_mat_2.npy \
-    --data_type_dci hirid --save_score --eval_type sap
+    --data_type_dci hirid --save_score --eval_type "$metric"
   done
 
   # adagvae
@@ -25,6 +25,6 @@ for metric in modularity sap; do
     --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_std.npz \
     --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/dgpvae/models/hirid/comp/ada/dim_8/"$model_name" \
     --assign_mat_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/assign_mats/assign_mat_2.npy \
-    --data_type_dci hirid --save_score --eval_type sap
+    --data_type_dci hirid --save_score --eval_type "$metric"
   done
 done
