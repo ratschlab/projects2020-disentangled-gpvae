@@ -33,7 +33,7 @@
     bsub -o /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/cars_part1/cars_modularity_n_"$n"_2 \
     -g /gpvae_eval -R "rusage[mem=20000]" python eval_dci.py \
     --dci_seed 0 --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/cars3d/factors_cars_part1.npz \
-    --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/cars_part1/base/len_5/same/"$model_name" \
+    --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/cars_part1/base/len_5/same/final_10/"$model_name" \
     --data_type_dci cars3d --save_score --eval_type modularity
   done
 #  bsub -o /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/cars_part1/cars_"$metric"_n_10 \
