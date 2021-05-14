@@ -203,7 +203,7 @@ def main(argv):
             print(F"Saved scores at :{os.path.join('baselines', FLAGS.model, FLAGS.exp_name, F'{FLAGS.metric}_aggr.npy')}")
         elif FLAGS.model == 'hirid':
             if FLAGS.dci_seed is not None:
-                filename = os.path.join(FLAGS.base_dir, F'dci_assign_2_{FLAGS.exp_name}_{FLAGS.dci_seed}.npy')
+                filename = os.path.join(FLAGS.base_dir, F'{FLAGS.metric}_assign_2_{FLAGS.exp_name}_{FLAGS.dci_seed}.npy')
             else:
                 filename = os.path.join(FLAGS.base_dir, F'{FLAGS.metric}_assign_2_{FLAGS.exp_name}_orig.npy')
             print(filename)
