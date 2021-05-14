@@ -73,8 +73,11 @@ def aggregate_gpvae(N, metric, base_dir):
 
     return scores
 
-def aggregate_hirid(N, base_dir):
-    scores = np.zeros((N,5))
+def aggregate_hirid(N, metric, base_dir):
+    if metric == 'dci':
+        scores = np.zeros((N,5))
+    else:
+        scores = np.zeros((N,5))
 
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     if FLAGS.exp_name != '':
@@ -83,18 +86,27 @@ def aggregate_hirid(N, base_dir):
         subdirs = subdirs[:N]
     assert len(subdirs) == N
     for i, subdir in enumerate(subdirs):
-        if FLAGS.dci_seed is not None:
-            single_score_path = os.path.join(subdir,F'dci_assign_{FLAGS.dci_seed}.npz')
-        else:
-            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
-            print(potential_paths)
-            single_score_path = os.path.join(subdir,potential_paths[0])
-        single_score = np.load(single_score_path)
-        scores[i, 0] = single_score['disentanglement']
-        scores[i, 1] = single_score['completeness']
-        scores[i, 2] = single_score['disentanglement_assign']
-        scores[i, 3] = single_score['completeness_assign']
-        scores[i, 4] = single_score['informativeness_test']
+        if metric == 'dci':
+            if FLAGS.dci_seed is not None:
+                single_score_path = os.path.join(subdir,F'dci_assign_{FLAGS.dci_seed}.npz')
+            else:
+                potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
+                print(potential_paths)
+                single_score_path = os.path.join(subdir,potential_paths[0])
+            single_score = np.load(single_score_path)
+            scores[i, 0] = single_score['disentanglement']
+            scores[i, 1] = single_score['completeness']
+            scores[i, 2] = single_score['disentanglement_assign']
+            scores[i, 3] = single_score['completeness_assign']
+            scores[i, 4] = single_score['informativeness_test']
+        elif metric == 'modularity':
+            single_score_path = os.path.join(subdir, F'modularity_assign_{FLAGS.dci_seed}.npz')
+            scores[i, 0] = single_score['modularity']
+            scores[i, 1] = single_score['modularity_assign']
+        elif metric == 'sap':
+            single_score_path = os.path.join(subdir, F'sap_assign_{FLAGS.dci_seed}.npz')
+            scores[i, 0] = single_score['sap']
+            scores[i, 1] = single_score['sap_assign']
 
     return scores
 
