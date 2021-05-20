@@ -22,7 +22,7 @@
 
 for n in {1..10}; do
   seed=$RANDOM
-  for i in dsprites,dsptries_gp_full_range4 smallnorb,norb_full1 cars3d,cars_part1 shapes3d,shapes_part2; do
+  for i in dsprites,dsprites_gp_full_range4 smallnorb,norb_full1 cars3d,cars_part1 shapes3d,shapes_part2; do
     IFS=',' read dataset data_name <<< "${i}"
     # Brownian bridge kernel
     bsub -o log_bb_n"$n"_"$dataset"_%J -g /gpvae_disent \
