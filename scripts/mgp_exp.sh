@@ -25,7 +25,7 @@ for n in {1..10}; do
   for i in dsprites,dsptries_gp_full_range4 smallnorb,norb_full1 cars3d,cars_part1 shapes3d,shapes_part2; do
     IFS=',' read dataset data_name <<< "${i}"
     # Brownian bridge kernel
-    bsub -o log_bb_n"$n"_"$dataset"_%J -g /gpvae_disent \
+    bsub -o models/mgpvae/bb/"$dataset"/log_bb_n"$n"_%J -g /gpvae_disent \
     -R "rusage[mem=220000,ngpus_excl_p=1]" \
     python run_experiment.py --model_type dgp-vae --data_type "$dataset" --time_len 5 --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/"$dataset"/"$data_name".npz \
@@ -36,7 +36,7 @@ for n in {1..10}; do
     --save_score
 
     # Fractional brownian motion kernel
-    bsub -o log_fbm_n"$n"_"$dataset"_%J -g /gpvae_disent \
+    bsub -o models/mgpvae/fbm/"$dataset"/log_bb_n"$n"_%J -g /gpvae_disent \
     -R "rusage[mem=220000,ngpus_excl_p=1]" \
     python run_experiment.py --model_type dgp-vae --data_type "$dataset" --time_len 5 --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/"$dataset"/"$data_name".npz \
