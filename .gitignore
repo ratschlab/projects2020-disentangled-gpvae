@@ -133,6 +133,7 @@ scripts/*
 !/scripts/additional_metrics_eval.sh
 !/scripts/hirid_additional_metrics_eval.sh
 !/scripts/aggregate_new_metrics_baselines.sh
+!/scripts/mgp_exp.sh
 
 # Baselines
 #baselines/
