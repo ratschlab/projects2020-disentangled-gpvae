@@ -392,14 +392,17 @@ class GP_VAE(HI_VAE):
         self.kernel_scales = kernel_scales
         self.const_val = const_val
         if kernel_scales >= 1:
-            length_scales = []
-            for i in range(self.kernel_scales):
-                if len_init=='same':
-                    length_scales.append(length_scale)
-                elif len_init=='scaled':
-                    length_scales.append(length_scale / 2 ** i)
-                else:
-                    raise ValueError("len_scale must be same or scaled")
+            if self.kernel == 'fbm': # special linear scaling for this case
+                length_scales = np.linspace(0.1, 0.9, num=kernel_scales, endpoint=True)
+            else:
+                length_scales = []
+                for i in range(self.kernel_scales):
+                    if len_init=='same':
+                        length_scales.append(length_scale)
+                    elif len_init=='scaled':
+                        length_scales.append(length_scale / 2 ** i)
+                    else:
+                        raise ValueError("len_scale must be same or scaled")
             if learnable_len_scale:
                 self.length_scale = tf.Variable(length_scales, trainable=True, name='len_scale')
             else:
@@ -443,6 +446,10 @@ class GP_VAE(HI_VAE):
                 kernel_matrices.append(const_kernel(self.time_length, const_val=self.const_val))
             elif self.kernel == "id":
                 kernel_matrices.append(id_kernel(self.time_length))
+            elif self.kernel == 'bb':
+                kernel_matrices.append(bb_kernel(self.time_length))
+            elif self.kernel == 'fbm':
+                kernel_matrices.append(fbm_kernel(self.time_length, H=0.1))
 
         # Combine kernel matrices for each latent dimension
         tiled_matrices = []

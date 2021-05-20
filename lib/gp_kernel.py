@@ -1,5 +1,6 @@
 import tensorflow as tf
 import math
+import numpy as np
 
 ''' 
 
@@ -83,3 +84,30 @@ def const_kernel(T, const_val):
 def id_kernel(T):
     kernel_matrix = tf.eye(T)
     return kernel_matrix
+
+def bb_kernel(T, fac=0.1):
+    """
+    From MGP-VAE paper.
+    """
+    sigma_p = np.zeros((T, T))
+    for i in range(T):
+        for j in range(i):
+            sigma_p[i, j] = (1 - i / T) * (1 - j / T) + (i * j) / \
+                            (T * T) + (fac * fac) * (j - (i * j) / T)
+            sigma_p[j, i] = sigma_p[i, j]
+        sigma_p[i, i] = (1 - i / T) * (1 - i / T) + (i * i) / \
+                        (T * T) + (fac * fac) * i * (1 - i / T)
+    return tf.convert_to_tensor(sigma_p.astype(np.float32))
+
+def fbm_kernel(T, H, fac=0.3):
+    """
+    From MGP-VAE paper.
+    """
+    sigma_p = np.zeros((T, T))
+    for i in range(T):
+        for j in range(i):
+            sigma_p[i, j] = 1 + (fac * fac) * 0.5 * (
+                        i ** (2 * H) + j ** (2 * H) - (i - j) ** (2 * H))
+            sigma_p[j, i] = sigma_p[i, j]
+        sigma_p[i, i] = 1 + (fac * fac) * i ** (2 * H)
+    return tf.convert_to_tensor(sigma_p.astype(np.float32))
