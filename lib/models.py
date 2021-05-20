@@ -449,7 +449,7 @@ class GP_VAE(HI_VAE):
             elif self.kernel == 'bb':
                 kernel_matrices.append(bb_kernel(self.time_length))
             elif self.kernel == 'fbm':
-                kernel_matrices.append(fbm_kernel(self.time_length, H=0.1))
+                kernel_matrices.append(fbm_kernel(self.time_length, H=self.length_scale[i]))
 
         # Combine kernel matrices for each latent dimension
         tiled_matrices = []
