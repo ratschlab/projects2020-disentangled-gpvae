@@ -26,7 +26,7 @@ for n in {1..10}; do
     IFS=',' read dataset data_name <<< "${i}"
     # Brownian bridge kernel
     bsub -o log_3_bb_n"$n"_"$dataset"_%J -g /disent_baseline \
-    -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==TeslaV100_SXM2_32GB]" \
+    -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
     python run_experiment.py --model_type dgp-vae --data_type "$dataset" --time_len 5 --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/"$dataset"/"$data_name".npz \
     --exp_name n_"$n"_3 --basedir models/mgpvae/bb/"$dataset" \
@@ -37,7 +37,7 @@ for n in {1..10}; do
 
     # Fractional brownian motion kernel
     bsub -o log_3_t_fbm_n"$n"_"$dataset"_%J -g /disent_baseline \
-    -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==TeslaV100_SXM2_32GB]"\
+    -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"\
     python run_experiment.py --model_type dgp-vae --data_type "$dataset" --time_len 5 --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/"$dataset"/"$data_name".npz \
     --exp_name n_"$n"_3 --basedir models/mgpvae/fbm/"$dataset" \
